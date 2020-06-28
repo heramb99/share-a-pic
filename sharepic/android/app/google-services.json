@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "172239945976",
+    "firebase_url": "https://sharepic-4d505.firebaseio.com",
+    "project_id": "sharepic-4d505",
+    "storage_bucket": "sharepic-4d505.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172239945976:android:b13a2f0779268b14843b0d",
+        "android_client_info": {
+          "package_name": "com.example.sharepic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172239945976-lrk5dcm18cb9dr6lg5ov3s6d0ufli60u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sharepic",
+            "certificate_hash": "8972c44d5ea0cf6bab623b5c6ae686560f0c6fee"
+          }
+        },
+        {
+          "client_id": "172239945976-jddfvuo0rj24m3b7rgrgfsaobektjm42.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmJ88oSN_0dBvE64D4OZjR-m600KKTm8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172239945976-jddfvuo0rj24m3b7rgrgfsaobektjm42.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

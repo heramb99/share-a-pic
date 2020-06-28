@@ -34,7 +34,14 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: Colors.orange[900],
       ),
-      drawer: NavDrawer(),
+      drawer: NavDrawer(user: user,),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orange[900],
+        onPressed: (){
+
+        },
+        child: Icon(Icons.add,color: Colors.white,),
+      ),
       body: Container(
         padding: EdgeInsets.all(32),
         child: Column(

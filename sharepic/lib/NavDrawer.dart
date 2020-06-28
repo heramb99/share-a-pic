@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sharepic/HomePage.dart';
 import 'package:sharepic/main.dart';
+import 'ProfilePage.dart';
+import 'Strings.dart';
 
 class NavDrawer extends StatelessWidget {
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseUser user;
+  final FirebaseAuth _firebaseAuth=FirebaseAuth.instance;
+
+  NavDrawer({this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -13,27 +19,34 @@ class NavDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text(
-              'Side menu',
-              style: TextStyle(color: Colors.white, fontSize: 25),
+            child: Center(
+              child: Icon(Icons.person_outline,color: Colors.white,size: 60,),
             ),
             decoration: BoxDecoration(
                 color: Colors.green,
-              ),
+                image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage('assets/images/header_image.jpg'))),
           ),
           ListTile(
-            leading: Icon(Icons.input),
-            title: Text('Welcome'),
-            onTap: () => {},
+            leading: Icon(Icons.home),
+            title: Text(Strings().home,style: TextStyle(color:Colors.black),),
+            onTap: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => HomePage(user:user)));
+            },
           ),
           ListTile(
             leading: Icon(Icons.person),
-            title: Text('Profile'),
-            onTap: () => {Navigator.of(context).pop()},
+            title: Text(Strings().profile,style: TextStyle(color:Colors.black),),
+            onTap: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) => ProfilePage(user: user,)));
+            },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
-            title: Text('Logout'),
+            title: Text(Strings().logout,style: TextStyle(color:Colors.black),),
             onTap: () async{
               await _firebaseAuth.signOut();
               Navigator.pushReplacement(context, MaterialPageRoute(

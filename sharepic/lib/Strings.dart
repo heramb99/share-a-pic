@@ -11,4 +11,10 @@ class Strings{
   final String nameHint= "Enter Name";
   final String dobHint="Select DOB";
   final String signUpFormButton="Submit";
+  final String verified="Verified";
+  final String unverified="Click to verify";
+  final String profile="Profile";
+  final String logout="Logout";
+  final String home="Home";
+  final String loading="Loading...";
 }

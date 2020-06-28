@@ -47,21 +47,6 @@ class LoginPageState extends State<LoginPage>{
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-//   //loading strings.json file
-//   Future<String>_loadFromAsset() async {
-//     return await rootBundle.loadString("assets/strings/en.json");
-//   }
-
-// Future parseStringsJson() async {
-//     String jsonString = await _loadFromAsset();
-//     String s = await jsonDecode(jsonString);
-//     return s;
-// }
-// Future<String> getStringValue(String key){
-//   print(strings);
-//   return strings[key];
-// }
-
   Future<void> checkForLogin(String email,String password,BuildContext context) async{
 
     progressDialog.show();
@@ -81,7 +66,7 @@ class LoginPageState extends State<LoginPage>{
 
       if (user != null) {
         Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => HomePage(user: user)));
+          builder: (context) => HomePage(user: user,)));
 
       } else {
         Fluttertoast.showToast(
@@ -118,7 +103,7 @@ class LoginPageState extends State<LoginPage>{
     getUser().then((user) {
       if (user != null) {
         Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => HomePage(user: user)));
+          builder: (context) => HomePage(user: user,)));
       }
     });
   }
@@ -305,7 +290,7 @@ class LoginPageState extends State<LoginPage>{
                                   style: TextStyle(color: Colors.orange[900], fontSize: 17),
                                   recognizer: TapGestureRecognizer()
                                   ..onTap=(){
-                                    Navigator.push(context,MaterialPageRoute(builder:(context)=>PhoneSignPage()));
+                                    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>PhoneSignPage()));
                                   }
                                 )
                               ]),

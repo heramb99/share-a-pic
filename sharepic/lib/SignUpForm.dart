@@ -115,7 +115,7 @@ class SignUpFormState extends State<SignUpForm>{
         uploadInfo(User(name: _name,email: _email,dob:_dob,mobile: mobile),user);
         //navigating to home screen
         Navigator.pushReplacement(context, MaterialPageRoute(
-          builder: (context) => HomePage(user: user)));
+          builder: (context) => HomePage(user: user,)));
 
       }else{
         progressDialog.hide();

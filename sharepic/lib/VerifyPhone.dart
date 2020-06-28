@@ -288,7 +288,9 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                                     style: TextStyle(color: Colors.orange[900], fontSize: 17),
                                     recognizer: TapGestureRecognizer()
                                     ..onTap=(){
-                                      Navigator.pop(context);}
+                                      Navigator.pushReplacement(context, MaterialPageRoute(
+                                        builder: (context) => LoginPage()));
+                                    }
                                   )
                                 ]
                                 ),

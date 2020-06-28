@@ -17,4 +17,6 @@ class Strings{
   final String logout="Logout";
   final String home="Home";
   final String loading="Loading...";
+  final String hashtagHint="Enter HashTag";
+
 }

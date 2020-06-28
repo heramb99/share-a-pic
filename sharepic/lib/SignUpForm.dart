@@ -1,7 +1,9 @@
 
 import './main.dart';
+import './Strings.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'dart:async' show Future;
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'models/Users.dart';
 
 
 class SignUpForm extends StatefulWidget{
@@ -34,6 +37,8 @@ class SignUpFormState extends State<SignUpForm>{
   TextEditingController dobController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final dbRef = FirebaseDatabase.instance.reference().child("users");
+
   bool _autoValidate = false;
   String _name;
   String _email;
@@ -76,9 +81,13 @@ class SignUpFormState extends State<SignUpForm>{
       return false;
     }
 
+  Future uploadInfo(User userInfo,FirebaseUser user){
+    dbRef.child(user.uid.toString()).set(userInfo.toJson());
+  }
+
   
   Future _validateInputs(BuildContext context) async {
-    
+    progressDialog.show();
 
     if (_formKey.currentState.validate()) {
   //    If all data are correct then save data to out variables
@@ -88,7 +97,7 @@ class SignUpFormState extends State<SignUpForm>{
     final FirebaseAuth _auth = FirebaseAuth.instance;
     
     try {
-
+        
         //creating account using email and password
         AuthResult result = await _auth.createUserWithEmailAndPassword(
         email:_email,
@@ -99,12 +108,17 @@ class SignUpFormState extends State<SignUpForm>{
     } catch (e) {
       print(e.toString());
     } finally {
+      progressDialog.hide();
       if (user != null) {
 
-        Navigator.push(context, MaterialPageRoute(
+        //uploading info
+        uploadInfo(User(name: _name,email: _email,dob:_dob,mobile: mobile),user);
+        //navigating to home screen
+        Navigator.pushReplacement(context, MaterialPageRoute(
           builder: (context) => HomePage(user: user)));
 
       }else{
+        progressDialog.hide();
         Fluttertoast.showToast(
           msg: "Error",
           toastLength: Toast.LENGTH_SHORT,
@@ -126,7 +140,6 @@ class SignUpFormState extends State<SignUpForm>{
   Widget build(BuildContext context) {
 
      progressDialog = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
-    // progressDialogDelete = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
 
     progressDialog.style(
       message: 'Connecting...',
@@ -199,7 +212,7 @@ class SignUpFormState extends State<SignUpForm>{
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       children: <Widget>[
-                        FadeAnimation(1.5, Text(LoginPageState().strings["signUpTitle"],style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
+                        FadeAnimation(1.5, Text(Strings().signUpTitle,style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
                         SizedBox(height: 25,),
                         FadeAnimation(1.7, Container(
                           decoration: BoxDecoration(
@@ -231,7 +244,7 @@ class SignUpFormState extends State<SignUpForm>{
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.person,color: Colors.grey,),
                                     border:InputBorder.none,
-                                    hintText: LoginPageState().strings["nameHint"],
+                                    hintText: Strings().nameHint,
                                     hintStyle: TextStyle(color:Colors.grey)
                                   ),
                                     ),
@@ -249,7 +262,7 @@ class SignUpFormState extends State<SignUpForm>{
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.contact_mail,color: Colors.grey,),
                                     border:InputBorder.none,
-                                    hintText: LoginPageState().strings["emailHint"],
+                                    hintText: Strings().emailHint,
                                     hintStyle: TextStyle(color:Colors.grey)
                                   ),
                                   keyboardType: TextInputType.emailAddress,
@@ -281,7 +294,7 @@ class SignUpFormState extends State<SignUpForm>{
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.calendar_today,color: Colors.grey,),
                                     border:InputBorder.none,
-                                    hintText: LoginPageState().strings["dobHint"],
+                                    hintText: Strings().dobHint,
                                     hintStyle: TextStyle(color:Colors.grey)
                                   ),
                                   
@@ -301,7 +314,7 @@ class SignUpFormState extends State<SignUpForm>{
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(Icons.lock,color: Colors.grey,),
                                     border:InputBorder.none,
-                                    hintText: LoginPageState().strings["passwordHint"],
+                                    hintText: Strings().passwordHint,
                                     hintStyle: TextStyle(color:Colors.grey)
                                   ),
                                   keyboardType: TextInputType.visiblePassword,
@@ -325,7 +338,7 @@ class SignUpFormState extends State<SignUpForm>{
                               child: RaisedButton(
                               color: Colors.orange[900],
                               child: Center(
-                                child:Text(LoginPageState().strings["signUpFormButton"],style: TextStyle(color:Colors.white),)
+                                child:Text(Strings().signUpFormButton,style: TextStyle(color:Colors.white),)
                                 ),
                               onPressed: () {
                                 checkConnectivity().then((value) {
@@ -333,23 +346,23 @@ class SignUpFormState extends State<SignUpForm>{
                                     _validateInputs(context);
                                   }else{
                                     Fluttertoast.showToast(
-                                        msg: "No Internet Connnection",
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.CENTER,
-                                        timeInSecForIosWeb: 1
-                                      );
+                                      msg: "No Internet Connnection",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.CENTER,
+                                      timeInSecForIosWeb: 1
+                                    );
                                   }
                                 });
                               },
                             ),
                           )
                         ),
-                        ),
-                        SizedBox(height: 10,),
-                      ],
-                    ),
-                  )
-                ],
+                      ),
+                      SizedBox(height: 10,),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),

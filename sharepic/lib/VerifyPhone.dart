@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async' show Future;
 import './main.dart';
 import './SignUpForm.dart';
+import './Strings.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pin_entry_text_field/pin_entry_text_field.dart';
 
@@ -59,8 +60,8 @@ class PhoneSignPageState extends State<PhoneSignPage>{
         verificationCompleted: (AuthCredential credential) async{
           Navigator.of(context).pop();
 
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) => SignUpForm(mobile: _mobile,)
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) => SignUpForm(mobile: "+"+_countryCode.dialingCode+_mobile,)
           ));
 
         }, 
@@ -83,7 +84,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                   onSubmit: (String pin) async{
                     
                     Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => SignUpForm(mobile: _mobile,)
+                            builder: (context) => SignUpForm(mobile: "+"+_countryCode.dialingCode+_mobile,)
                         ));
                   },
                 )
@@ -175,7 +176,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                     padding: EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       children: <Widget>[
-                        FadeAnimation(1.5, Text(LoginPageState().strings["signUpTitle"],style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
+                        FadeAnimation(1.5, Text(Strings().signUpTitle,style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
                         SizedBox(height: 25,),
                         FadeAnimation(1.7, 
                           Container(
@@ -227,7 +228,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                                           validator: validateMobile,
                                           decoration: InputDecoration(
                                             border:InputBorder.none,
-                                            hintText: LoginPageState().strings["mobileHint"],
+                                            hintText: Strings().mobileHint,
                                             hintStyle: TextStyle(color:Colors.grey)
                                           ),
                                           keyboardType: TextInputType.phone
@@ -253,7 +254,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                               child: RaisedButton(
                               color: Colors.orange[900],
                               child: Center(
-                                child:Text(LoginPageState().strings["signupButton"],style: TextStyle(color:Colors.white),)
+                                child:Text(Strings().signupButton,style: TextStyle(color:Colors.white),)
                                 ),
                               onPressed: () {
                                 checkConnectivity().then((value) {
@@ -280,7 +281,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                                 padding: EdgeInsets.all(10),
                                 child: RichText(
                                 text: TextSpan(
-                                text: LoginPageState().strings["logInLinkText"], style: TextStyle(color: Colors.black, fontSize: 17),
+                                text: Strings().logInLinkText, style: TextStyle(color: Colors.black, fontSize: 17),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: ' Log In', 

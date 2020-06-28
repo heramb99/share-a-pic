@@ -8,21 +8,16 @@ import 'package:flutter/services.dart';
 import './SplashPage.dart';
 import 'dart:convert' show jsonDecode;
 import 'dart:async' show Future;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/io_client.dart';
 import './HomePage.dart';
 import 'VerifyPhone.dart';
+import './Strings.dart';
 
 
 void main() async{
 
-  WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences pref = await SharedPreferences.getInstance();
-  var name=pref.getString('name');
-  // print(name+" checking");
-  var userid=pref.getInt('userid');
   runApp(
     MaterialApp(
       home: SplashScreen(),
@@ -45,46 +40,50 @@ class LoginPage extends StatefulWidget{
 
 class LoginPageState extends State<LoginPage>{
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   ProgressDialog progressDialog;
-  var strings;
   
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  //loading strings.json file
-  Future<String>_loadFromAsset() async {
-    return await rootBundle.loadString("assets/strings/en.json");
-  }
+//   //loading strings.json file
+//   Future<String>_loadFromAsset() async {
+//     return await rootBundle.loadString("assets/strings/en.json");
+//   }
 
-Future parseStringsJson() async {
-    String jsonString = await _loadFromAsset();
-    strings = await jsonDecode(jsonString);
-    print(strings);
-}
+// Future parseStringsJson() async {
+//     String jsonString = await _loadFromAsset();
+//     String s = await jsonDecode(jsonString);
+//     return s;
+// }
+// Future<String> getStringValue(String key){
+//   print(strings);
+//   return strings[key];
+// }
 
   Future<void> checkForLogin(String email,String password,BuildContext context) async{
 
     progressDialog.show();
-    final ioc = new HttpClient();
-        ioc.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        final http = new IOClient(ioc);
-    var url = 'https://digitalboard.salmonjoy.com/app/login-app.php';
-    var loginresponse = await http.post(url,body: {'email':email,'password': password});
+    AuthResult result;
+    FirebaseUser user;
+    try {
 
+      result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
 
-    if(loginresponse.statusCode==200){
-      var res=jsonDecode(loginresponse.body);
-      // print(res);
-      if(res['status']){
-        progressDialog.hide();
-        // SharedPreferences pref = await SharedPreferences.getInstance();
-        // pref.setString('name', res['name']);
-        // pref.setInt('userid', int.parse(res['userid']));
-        // Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>FolderPage(name:res['name'],userid:int.parse(res['userid']))));
-      }else{
-        progressDialog.hide();
+      user=result.user;
+    
+    } catch (e) {
+      print(e.toString());
+    } finally {
+      progressDialog.hide();
+
+      if (user != null) {
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => HomePage(user: user)));
+
+      } else {
         Fluttertoast.showToast(
           msg: "Invalid Credentials",
           toastLength: Toast.LENGTH_SHORT,
@@ -93,7 +92,6 @@ Future parseStringsJson() async {
         );
       }
     }
-
   }
 
   //checking internet connection
@@ -109,10 +107,24 @@ Future parseStringsJson() async {
       return false;
     }
 
+  Future<FirebaseUser> getUser() async {
+    return await _auth.currentUser();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUser().then((user) {
+      if (user != null) {
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => HomePage(user: user)));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    parseStringsJson();
 
      progressDialog = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
 
@@ -185,8 +197,9 @@ Future parseStringsJson() async {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
+                    
                     children: <Widget>[
-                      FadeAnimation(1.5, Text(strings["loginTitle"],style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
+                      FadeAnimation(1.5, Text(Strings().loginTitle,style: TextStyle(color:Colors.orange[900],fontSize: 30,fontWeight:FontWeight.bold),)),
                       SizedBox(height: 25,),
                       FadeAnimation(1.7, Container(
                         decoration: BoxDecoration(
@@ -214,7 +227,7 @@ Future parseStringsJson() async {
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.email,color: Colors.grey,),
                                   border:InputBorder.none,
-                                  hintText: strings["emailHint"],
+                                  hintText: Strings().emailHint,
                                   hintStyle: TextStyle(color:Colors.grey)
                                 ),
                                 keyboardType: TextInputType.emailAddress,
@@ -228,7 +241,7 @@ Future parseStringsJson() async {
                                 decoration: InputDecoration(
                                   prefixIcon: Icon(Icons.lock_outline,color: Colors.grey,),
                                   border:InputBorder.none,
-                                  hintText: strings["passwordHint"],
+                                  hintText: Strings().passwordHint,
                                   hintStyle: TextStyle(color:Colors.grey)
                                 ),
                               ),
@@ -248,7 +261,7 @@ Future parseStringsJson() async {
                         child: RaisedButton(
                           color: Colors.orange[900],
                           child: Center(
-                            child:Text(strings["loginButtonText"],style: TextStyle(color:Colors.white),)
+                            child:Text(Strings().loginButtonText,style: TextStyle(color:Colors.white),)
                             ),
                           onPressed: () {
                             checkConnectivity().then((value) {
@@ -285,7 +298,7 @@ Future parseStringsJson() async {
                               padding: EdgeInsets.all(20),
                               child: RichText(
                               text: TextSpan(
-                              text: strings["signUpLinkText"], style: TextStyle(color: Colors.black, fontSize: 17),
+                              text: Strings().signUpLinkText, style: TextStyle(color: Colors.black, fontSize: 17),
                               children: <TextSpan>[
                                 TextSpan(
                                   text: ' Sign up', 

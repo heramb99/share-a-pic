@@ -6,7 +6,7 @@ Shared image is visible to all the users.
 How to use:
 
 1)Create account
-![Create](signin.gif)
+![SignIn](./signin.gif)
 
 2)Login and Verify email id
 ![Login](./login.gif)

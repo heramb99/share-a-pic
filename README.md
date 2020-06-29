@@ -6,11 +6,15 @@ Shared image is visible to all the users.
 How to use:
 
 1)Create account
-![SignIn](./signin.gif)
+<br>
+<img src="https://github.com/heramb99/share-a-pic/blob/master/signin.gif" height="600">
+<br>
 
 2)Login and Verify email id
-![Login](./login.gif)
+<br>
+<img src="https://github.com/heramb99/share-a-pic/blob/master/login.gif" height="600">
+<br>
 
 3)Share image
-![Share](./share.gif)
-
+<br>
+<img src="https://github.com/heramb99/share-a-pic/blob/master/share.gif" height="600">

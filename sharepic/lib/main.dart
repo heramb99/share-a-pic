@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import './Animation/FadeAnimation.dart';
 import 'package:flutter/services.dart';
 import './SplashPage.dart';
-import 'dart:convert' show jsonDecode;
 import 'dart:async' show Future;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -26,6 +25,7 @@ void main() async{
         '/signpage':(context)=>PhoneSignPage(),
         '/homepage':(context)=>HomePage(),
       },
+      debugShowCheckedModeBanner:false
     )
   );
 }
@@ -47,16 +47,14 @@ class LoginPageState extends State<LoginPage>{
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  //login function
   Future<void> checkForLogin(String email,String password,BuildContext context) async{
 
     progressDialog.show();
     AuthResult result;
     FirebaseUser user;
     try {
-
-      result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-
+      result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       user=result.user;
     
     } catch (e) {
@@ -100,6 +98,7 @@ class LoginPageState extends State<LoginPage>{
   void initState() {
     super.initState();
 
+    //checking for login
     getUser().then((user) {
       if (user != null) {
         Navigator.pushReplacement(context, MaterialPageRoute(
@@ -111,7 +110,7 @@ class LoginPageState extends State<LoginPage>{
   @override
   Widget build(BuildContext context) {
 
-     progressDialog = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
+    progressDialog = ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: true);
 
     progressDialog.style(
       message: 'Connecting...',
@@ -130,7 +129,8 @@ class LoginPageState extends State<LoginPage>{
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.deepOrange[900],
-      statusBarBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.light
     ));
 
 

@@ -42,8 +42,6 @@ class PhoneSignPageState extends State<PhoneSignPage>{
   
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController _codeController = TextEditingController();
-
 
   Future _validateInputs(BuildContext context) async{
     _formKey.currentState.save();
@@ -82,13 +80,10 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                   isTextObscure: false,
                   fontSize: 15.0,
                   onSubmit: (String pin) async{
-                    
                     Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => SignUpForm(mobile: "+"+_countryCode.dialingCode+_mobile,)
-                        ));
+                      builder: (context) => SignUpForm(mobile: "+"+_countryCode.dialingCode+_mobile,)));
                   },
                 )
-   
               );
             }
           );
@@ -298,16 +293,15 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                             )
                           )
                         )
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                      )
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
         ),
       )
-    );               
-
+    );
   }
 }

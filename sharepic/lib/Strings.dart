@@ -18,5 +18,6 @@ class Strings{
   final String home="Home";
   final String loading="Loading...";
   final String hashtagHint="Enter HashTag";
+  final String zeroImages="No Images Shared";
 
 }

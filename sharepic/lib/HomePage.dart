@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_database/firebase_database.dart';
 import './models/ImageModel.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:photo_view/photo_view.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -30,33 +32,40 @@ class _HomePageState extends State<HomePage> {
   _HomePageState({this.user});
 
   TextEditingController hashTagController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
   final dbRef = FirebaseDatabase.instance.reference().child("images");
   ProgressDialog progressDialog;
+  List imageList=List();
+  StreamSubscription subscription;
 
-  Future pickAndUploadImage(String hashtag) async{
+  //fetch newly uploaded image using subscription
+  void imageAddedSubscription(Event event){
+    setState(() {});
+  }
 
+  Future pickAndUploadImage(String hashtag,String name) async{
+
+      //picking image from gallery
       final picker = ImagePicker();
       var pickedFile = await picker.getImage(source: ImageSource.gallery);
       File imageFile = File(pickedFile.path);
       
       progressDialog.show();
+
+      //uploading image to firebase storage
       String fileName = basename(pickedFile.path);
       StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(fileName);
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(imageFile);
-
       StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
-
       String url = (await downloadUrl.ref.getDownloadURL());
 
+      //getting current date
       var date = new DateTime.now().toString();
- 
       var dateParse = DateTime.parse(date);
- 
       var formattedDate = "${dateParse.day}-${dateParse.month}-${dateParse.year}";
  
-
-      ImageModel imageModel=ImageModel(fileName: fileName,hashTag: hashtag,date:formattedDate.toString(),userid: user.uid,url: url);
-
+      //uploading image info to database
+      ImageModel imageModel=ImageModel(fileName: name,hashTag: hashtag,date:formattedDate.toString(),userid: user.uid,url: url);
       dbRef.push().set(imageModel.toJson());
 
       progressDialog.hide();
@@ -66,7 +75,18 @@ class _HomePageState extends State<HomePage> {
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 1
       );
-          // setState(() {});
+  }
+  @override
+  void initState() {
+    super.initState();
+    subscription = dbRef.onChildAdded.listen(imageAddedSubscription);
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
   }
 
   @override
@@ -109,18 +129,24 @@ class _HomePageState extends State<HomePage> {
             showDialog<String>(
             context: context,
             child: AlertDialog(
-            title: Text('Post Image'),
+              title: Text('Post Image'),
               contentPadding: const EdgeInsets.all(16.0),
-              content: Row(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: hashTagController,
-                      style: TextStyle(color:Colors.black),
-                      autofocus: true,
-                      decoration:InputDecoration(
-                      hintText: Strings().hashtagHint),
-                    ),
+                  TextField(
+                    controller: nameController,
+                    style: TextStyle(color:Colors.black),
+                    autofocus: true,
+                    decoration:InputDecoration(
+                    hintText: Strings().nameHint),
+                  ),
+                  TextField(
+                    controller: hashTagController,
+                    style: TextStyle(color:Colors.black),
+                    autofocus: true,
+                    decoration:InputDecoration(
+                    hintText: Strings().hashtagHint),
                   )
                 ],
               ),
@@ -134,19 +160,28 @@ class _HomePageState extends State<HomePage> {
                   FlatButton( 
                     child: const Text('Select Image',style: TextStyle(color:Colors.black)),
                     onPressed: (){
-                      if(hashTagController.text.trim()==""){
+                      if(hashTagController.text.trim()=="" || nameController.text.trim()==""){
                         Navigator.pop(context);
                         Fluttertoast.showToast(
-                          msg: "Enter file name",
+                          msg: "Fill empty fields",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1
+                        );
+                      }else if(hashTagController.text.length>32 || nameController.text.length>32){
+                        Navigator.pop(context);
+                        Fluttertoast.showToast(
+                          msg: "Only 32 characters are allowed",
                           toastLength: Toast.LENGTH_SHORT,
                           gravity: ToastGravity.CENTER,
                           timeInSecForIosWeb: 1
                         );
                       }else{
                         Navigator.pop(context);
-                        pickAndUploadImage(hashTagController.text);            
+                        pickAndUploadImage(hashTagController.text,nameController.text);            
                       } 
                       hashTagController.clear();
+                      nameController.clear();
                     },
                   )
                 ],
@@ -175,14 +210,84 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.add,color: Colors.white,),
       ),
       body: Container(
-        padding: EdgeInsets.all(32),
+        padding: EdgeInsets.all(12),
+        width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text("You are Logged in succesfully", style: TextStyle(color: Colors.lightBlue, fontSize: 32),),
+          children: <Widget>[ 
             SizedBox(height: 16,),
-            Text("${user.email}+" "${user.isEmailVerified.toString()}", style: TextStyle(color: Colors.grey, ),),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        child:FutureBuilder(
+                          future: dbRef.once(),
+                          builder: (context, AsyncSnapshot<DataSnapshot> snapshot){
+                            if (snapshot.connectionState == ConnectionState.waiting){
+                              return Container(
+                                child: Center(
+                                  child : CircularProgressIndicator()
+                                ),
+                              );
+                            }else if(snapshot.hasData){
+                              imageList.clear();
+                              Map<dynamic, dynamic> values = snapshot.data.value;
+                              if(values==null){
+                                return Center(
+                                  child: Text(Strings().zeroImages,style: TextStyle(color:Colors.black,fontSize: 18),),
+                                );
+                              }else{
+                                values.forEach((key, values) {
+                                  imageList.add(values);
+                                });
+                                return ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  itemCount: imageList.length,
+                                  itemBuilder: (BuildContext context, int index){
+                                    return Container(
+                                      height: 400,
+                                      child: Card(
+                                        elevation: 10,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Text(imageList[index]["filename"],style: TextStyle(color:Colors.black,fontSize: 20,fontWeight: FontWeight.bold),),
+                                              SizedBox(height: 5,),
+                                              Text(imageList[index]["hashtag"],style: TextStyle(color:Colors.blue,fontSize: 16),),
+                                              SizedBox(height: 5,),
+                                              Expanded(
+                                                child: ClipRect(
+                                                  child:PhotoView(
+                                                    imageProvider: NetworkImage(imageList[index]["url"])
+                                                  )
+                                                ),
+                                              ),
+                                              SizedBox(height: 5,),
+                                              Text("Posted on:"+imageList[index]["date"],style: TextStyle(color:Colors.black,fontSize: 16),)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                );
+                              }
+                            }
+                          }
+                        )
+                      ),
+                    )
+                  ],
+                ),
+              )
+            )
           ],
         ),
       ),

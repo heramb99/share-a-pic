@@ -23,7 +23,6 @@ class NavDrawer extends StatelessWidget {
               child: Icon(Icons.person_outline,color: Colors.white,size: 60,),
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
                 image: DecorationImage(
                     fit: BoxFit.fill,
                     image: AssetImage('assets/images/header_image.jpg'))),

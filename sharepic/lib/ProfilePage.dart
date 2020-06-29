@@ -20,10 +20,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   _ProfilePageState({this.user});
 
-  
+  //list for storing user info
   List info=List<String>();
 
-final dbRef = FirebaseDatabase.instance.reference().child("users");
+  final dbRef = FirebaseDatabase.instance.reference().child("users");
   
 
   @override
@@ -60,7 +60,6 @@ final dbRef = FirebaseDatabase.instance.reference().child("users");
                       );
                     }
                     if (snapshot.hasData){
-                      print(snapshot.data);
                       info.clear();
                       Map<dynamic, dynamic> values = snapshot.data.value;
                       values.forEach((key, values) {
@@ -225,8 +224,7 @@ final dbRef = FirebaseDatabase.instance.reference().child("users");
                         ],
                       );
                     }
-                  }
-                    ),
+                  }),
                 ),
               ],
             )

@@ -45,6 +45,7 @@ class SignUpFormState extends State<SignUpForm>{
   String _password;
   String _dob;
 
+  //validation functions for form inputs
   String validateName(String value) {
     if (value.length <= 2)
       return 'Name must be more than 2 charater';
@@ -69,6 +70,7 @@ class SignUpFormState extends State<SignUpForm>{
       return null;
   }
 
+  //check for internet connection
   Future<bool> checkConnectivity() async{
       try {
         final result = await InternetAddress.lookup('google.com');
@@ -81,21 +83,21 @@ class SignUpFormState extends State<SignUpForm>{
       return false;
     }
 
+  //uploading user info to database
   Future uploadInfo(User userInfo,FirebaseUser user){
     dbRef.child(user.uid.toString()).set(userInfo.toJson());
   }
 
-  
-  Future _validateInputs(BuildContext context) async {
+  //Function for account creation
+  Future _submitInputs(BuildContext context) async {
     progressDialog.show();
 
     if (_formKey.currentState.validate()) {
-  //    If all data are correct then save data to out variables
+    //If all data are correct then save data to out variables
       _formKey.currentState.save();
       
     FirebaseUser user;
     final FirebaseAuth _auth = FirebaseAuth.instance;
-    
     try {
         
         //creating account using email and password
@@ -128,7 +130,7 @@ class SignUpFormState extends State<SignUpForm>{
       }
     }
     } else {
-  //    If all data are not valid then start auto validation.
+      //If all data are not valid then start auto validation.
       setState(() {
         _autoValidate = true;
       });
@@ -343,7 +345,7 @@ class SignUpFormState extends State<SignUpForm>{
                               onPressed: () {
                                 checkConnectivity().then((value) {
                                   if(value){
-                                    _validateInputs(context);
+                                    _submitInputs(context);
                                   }else{
                                     Fluttertoast.showToast(
                                       msg: "No Internet Connnection",

@@ -6,11 +6,10 @@ Shared image is visible to all the users.
 How to use:
 
 1)Create account
-![Create](signin.gif)
+![Alt text](signin.gif) / ![](signin.gif)
 
 2)Login and Verify email id
-![Login](./login.gif)
+![Alt text](login.gif) / ![](login.gif)
 
 3)Share image
-![Share](./share.gif)
-
+![Alt text](share.gif) / ![](share.gif)

@@ -80,7 +80,7 @@ class PhoneSignPageState extends State<PhoneSignPage>{
                   isTextObscure: false,
                   fontSize: 15.0,
                   onSubmit: (String pin) async{
-                    Navigator.push(context, MaterialPageRoute(
+                    Navigator.pushReplacement(context, MaterialPageRoute(
                       builder: (context) => SignUpForm(mobile: "+"+_countryCode.dialingCode+_mobile,)));
                   },
                 )
